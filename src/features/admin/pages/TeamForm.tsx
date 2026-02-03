@@ -26,13 +26,13 @@ import { mockDataService } from '@/lib/mockData';
 
 
 // Admin components
-import { SlugInput } from '@/components/admin/SlugInput';
-import { ImageUpload } from '@/components/admin/ImageUpload';
-import { CollapsibleSection } from '@/components/admin/CollapsibleSection';
-import { SkillsSelect } from '@/components/admin/TechStackSelect';
-import { ProjectSelect } from '@/components/admin/TeamMemberSelect';
-import { MetaFields } from '@/components/admin/MetaFields';
-import { FormActions } from '@/components/admin/FormActions';
+import { SlugInput } from '@/features/admin/components/forms/SlugInput';
+import { ImageUpload } from '@/features/admin/components/forms/ImageUpload';
+import { CollapsibleSection } from '@/features/admin/components/forms/CollapsibleSection';
+import { SkillsSelect } from '@/features/admin/components/forms/TechStackSelect';
+import { ProjectSelect } from '@/features/admin/components/forms/TeamMemberSelect';
+import { MetaFields } from '@/features/admin/components/forms/MetaFields';
+import { FormActions } from '@/features/admin/components/forms/FormActions';
 
 const SOCIAL_PLATFORMS = [
   { value: 'linkedin', label: 'LinkedIn', icon: Linkedin },
@@ -49,7 +49,7 @@ const STATUS_OPTIONS = [
   { value: 'alumni', label: 'Alumni', color: 'amber' },
 ];
 
-export function AdminTeamForm() {
+export function TeamForm() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const isNew = slug === 'new' || !slug;

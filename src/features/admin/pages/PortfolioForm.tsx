@@ -22,17 +22,17 @@ import { mockDataService } from '@/lib/mockData';
 import { PROJECT_CATEGORIES, PROJECT_STATUSES, VISIBILITY_OPTIONS } from '@/types';
 
 // Admin components
-import { SlugInput } from '@/components/admin/SlugInput';
-import { ImageUpload, GalleryImages } from '@/components/admin/ImageUpload';
-import { YouTubeInput } from '@/components/admin/YouTubeInput';
-import { CollapsibleSection } from '@/components/admin/CollapsibleSection';
-import { TechStackSelect } from '@/components/admin/TechStackSelect';
-import { TimelineEditor } from '@/components/admin/TimelineEditor';
-import { TeamMemberSelect } from '@/components/admin/TeamMemberSelect';
-import { MetaFields } from '@/components/admin/MetaFields';
-import { FormActions } from '@/components/admin/FormActions';
+import { SlugInput } from '@/features/admin/components/forms/SlugInput';
+import { ImageUpload, GalleryImages } from '@/features/admin/components/forms/ImageUpload';
+import { YouTubeInput } from '@/features/admin/components/forms/YouTubeInput';
+import { CollapsibleSection } from '@/features/admin/components/forms/CollapsibleSection';
+import { TechStackSelect } from '@/features/admin/components/forms/TechStackSelect';
+import { TimelineEditor } from '@/features/admin/components/forms/TimelineEditor';
+import { TeamMemberSelect } from '@/features/admin/components/forms/TeamMemberSelect';
+import { MetaFields } from '@/features/admin/components/forms/MetaFields';
+import { FormActions } from '@/features/admin/components/forms/FormActions';
 
-export function AdminPortfolioForm() {
+export function PortfolioForm() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const isNew = slug === 'new' || !slug;

@@ -27,7 +27,7 @@ const sidebarItems = [
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-export function Admin() {
+export function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   

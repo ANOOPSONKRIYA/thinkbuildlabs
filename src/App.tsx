@@ -5,25 +5,14 @@ import { Toaster } from 'sonner';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-import { Navigation } from '@/components/Navigation';
-import { Footer } from '@/components/Footer';
-import { LightBeams, NoiseOverlay } from '@/components/BackgroundEffects';
+// Shared Components
+import { Navigation, Footer, LightBeams, NoiseOverlay } from '@/components/shared';
 
-import { Home } from '@/pages/Home';
-import { Portfolio } from '@/pages/Portfolio';
-import { ProjectDetail } from '@/pages/ProjectDetail';
-import { Team } from '@/pages/Team';
-import { TeamMemberDetail } from '@/pages/TeamMemberDetail';
-import { About } from '@/pages/About';
-import { Admin } from '@/pages/Admin';
+// Public Pages
+import { Home, Portfolio, ProjectDetail, Team, TeamMemberDetail, About } from '@/features/public/pages';
 
-// New Admin Forms
-import { AdminPortfolioForm } from '@/pages/AdminPortfolioForm';
-import { AdminTeamForm } from '@/pages/AdminTeamForm';
-
-// Legacy Admin Edit Pages (kept for compatibility)
-import { AdminTeamEdit } from '@/pages/AdminTeamEdit';
-import { AdminProjectEdit } from '@/pages/AdminProjectEdit';
+// Admin Pages
+import { Dashboard, PortfolioForm, TeamForm, PortfolioEditLegacy, TeamEditLegacy } from '@/features/admin/pages';
 
 import './App.css';
 
@@ -168,22 +157,22 @@ function App() {
           
           {/* Admin Routes - No Layout */}
           {/* Dashboard */}
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/team" element={<Admin />} />
-          <Route path="/admin/projects" element={<Admin />} />
-          <Route path="/admin/settings" element={<Admin />} />
+          <Route path="/admin" element={<Dashboard />} />
+          <Route path="/admin/team" element={<Dashboard />} />
+          <Route path="/admin/projects" element={<Dashboard />} />
+          <Route path="/admin/settings" element={<Dashboard />} />
           
           {/* New Portfolio Admin Forms */}
-          <Route path="/admin/portfolio/new" element={<AdminPortfolioForm />} />
-          <Route path="/admin/portfolio/:slug" element={<AdminPortfolioForm />} />
+          <Route path="/admin/portfolio/new" element={<PortfolioForm />} />
+          <Route path="/admin/portfolio/:slug" element={<PortfolioForm />} />
           
           {/* New Team Admin Forms */}
-          <Route path="/admin/team/new" element={<AdminTeamForm />} />
-          <Route path="/admin/team/:slug" element={<AdminTeamForm />} />
+          <Route path="/admin/team/new" element={<TeamForm />} />
+          <Route path="/admin/team/:slug" element={<TeamForm />} />
           
-          {/* Legacy Routes (redirect to new routes) */}
-          <Route path="/admin/projects/:slug" element={<AdminProjectEdit />} />
-          <Route path="/admin/team-member/:slug" element={<AdminTeamEdit />} />
+          {/* Legacy Routes (kept for compatibility) */}
+          <Route path="/admin/projects/:slug" element={<PortfolioEditLegacy />} />
+          <Route path="/admin/team-member/:slug" element={<TeamEditLegacy />} />
           
           {/* 404 Route */}
           <Route

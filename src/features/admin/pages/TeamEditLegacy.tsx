@@ -22,7 +22,7 @@ const SOCIAL_PLATFORMS = [
   { value: 'portfolio', label: 'Portfolio', icon: Globe },
 ];
 
-export function AdminTeamEdit() {
+export function TeamEditLegacy() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const isNew = slug === 'new';

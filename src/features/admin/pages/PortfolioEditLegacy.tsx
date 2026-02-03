@@ -25,7 +25,7 @@ const STATUSES = [
   { value: 'completed', label: 'Completed' },
 ];
 
-export function AdminProjectEdit() {
+export function PortfolioEditLegacy() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const isNew = slug === 'new';
