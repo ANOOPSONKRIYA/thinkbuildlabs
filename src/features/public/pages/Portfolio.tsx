@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Filter, Cpu, Brain, FlaskConical } from 'lucide-react';
 import type { Project } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 
 const categories = [
   { id: 'all', label: 'All Projects', icon: Filter },

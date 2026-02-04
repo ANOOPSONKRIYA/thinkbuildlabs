@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 import type { Project, TeamMember } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 import { PROJECT_CATEGORIES, PROJECT_STATUSES, VISIBILITY_OPTIONS } from '@/types';
 
 // Admin components

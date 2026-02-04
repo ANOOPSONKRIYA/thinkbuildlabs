@@ -17,7 +17,7 @@ import {
   Layers
 } from 'lucide-react';
 import type { AboutData } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 
 // Partner logos using Lucide icons
 const PARTNER_ICONS = [

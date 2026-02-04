@@ -14,7 +14,7 @@ import {
   Tag
 } from 'lucide-react';
 import type { Project, TeamMember } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 
 export function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();

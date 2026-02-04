@@ -12,7 +12,7 @@ import {
   Play
 } from 'lucide-react';
 import type { Project, TimelineEvent, Video } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 
 const CATEGORIES = [
   { value: 'vlsi', label: 'VLSI Design' },

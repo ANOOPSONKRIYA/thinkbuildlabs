@@ -5,7 +5,7 @@ import type { Project, TeamMember, AboutData, AdminUser } from '@/types';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient<Database>(supabaseUrl, supabaseKey);
 
 // Database Types for TypeScript
 export type Database = {
@@ -30,6 +30,27 @@ export type Database = {
         Row: AdminUser;
         Insert: Omit<AdminUser, 'id' | 'createdAt'>;
         Update: Partial<AdminUser>;
+      };
+      site_settings: {
+        Row: {
+          id?: string;
+          siteName: string;
+          contactEmail: string;
+          heroVideoUrl: string;
+          isPrimary?: boolean;
+          createdAt?: string;
+          updatedAt?: string;
+        };
+        Insert: {
+          siteName: string;
+          contactEmail: string;
+          heroVideoUrl: string;
+        };
+        Update: Partial<{
+          siteName: string;
+          contactEmail: string;
+          heroVideoUrl: string;
+        }>;
       };
     };
   };
@@ -190,6 +211,22 @@ export async function deleteTeamMember(id: string): Promise<boolean> {
   return true;
 }
 
+// About
+export async function getAboutData(): Promise<AboutData | null> {
+  const { data, error } = await supabase
+    .from('about_data')
+    .select('*')
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching about data:', error);
+    return null;
+  }
+
+  return data || null;
+}
+
 // File Upload
 export async function uploadFile(bucket: string, path: string, file: File): Promise<string | null> {
   const { data, error } = await supabase
@@ -214,6 +251,20 @@ export async function uploadFile(bucket: string, path: string, file: File): Prom
 }
 
 // Auth
+export async function signInWithGoogle(redirectTo?: string) {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: redirectTo ? { redirectTo } : undefined,
+  });
+
+  if (error) {
+    console.error('Error signing in with Google:', error);
+    return null;
+  }
+
+  return data;
+}
+
 export async function signIn(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -242,6 +293,39 @@ export async function signOut() {
 export async function getCurrentUser() {
   const { data: { user } } = await supabase.auth.getUser();
   return user;
+}
+
+export async function getAdminUserByEmail(email: string): Promise<AdminUser | null> {
+  if (!email) return null;
+
+  const { data, error } = await supabase
+    .from('admin_users')
+    .select('*')
+    .eq('email', email)
+    .single();
+
+  if (error) {
+    return null;
+  }
+
+  return data || null;
+}
+
+export async function recordAdminLogin(user: { id: string; email?: string | null; user_metadata?: any }) {
+  if (!user?.email) return;
+
+  const updates = {
+    userId: user.id,
+    email: user.email,
+    name: user.user_metadata?.full_name || user.user_metadata?.name || user.email,
+    avatar: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+    lastLogin: new Date().toISOString(),
+  };
+
+  await supabase
+    .from('admin_users')
+    .update(updates)
+    .eq('email', user.email);
 }
 
 // Real-time subscriptions

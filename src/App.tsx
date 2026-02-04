@@ -13,6 +13,7 @@ import { Home, Portfolio, ProjectDetail, Team, TeamMemberDetail, About } from '@
 
 // Admin Pages
 import { Dashboard, PortfolioForm, TeamForm, PortfolioEditLegacy, TeamEditLegacy } from '@/features/admin/pages';
+import { AdminGate } from '@/features/admin/components/AdminGate';
 
 import './App.css';
 
@@ -87,6 +88,10 @@ function ToastInitializer() {
 }
 
 function App() {
+  const AdminRoute = ({ children }: { children: React.ReactNode }) => (
+    <AdminGate>{children}</AdminGate>
+  );
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -158,22 +163,22 @@ function App() {
           
           {/* Admin Routes - No Layout */}
           {/* Dashboard */}
-          <Route path="/admin" element={<Dashboard />} />
-          <Route path="/admin/team" element={<Dashboard />} />
-          <Route path="/admin/projects" element={<Dashboard />} />
-          <Route path="/admin/settings" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminRoute><Dashboard /></AdminRoute>} />
+          <Route path="/admin/team" element={<AdminRoute><Dashboard /></AdminRoute>} />
+          <Route path="/admin/projects" element={<AdminRoute><Dashboard /></AdminRoute>} />
+          <Route path="/admin/settings" element={<AdminRoute><Dashboard /></AdminRoute>} />
           
           {/* New Portfolio Admin Forms */}
-          <Route path="/admin/portfolio/new" element={<PortfolioForm />} />
-          <Route path="/admin/portfolio/:slug" element={<PortfolioForm />} />
+          <Route path="/admin/portfolio/new" element={<AdminRoute><PortfolioForm /></AdminRoute>} />
+          <Route path="/admin/portfolio/:slug" element={<AdminRoute><PortfolioForm /></AdminRoute>} />
           
           {/* New Team Admin Forms */}
-          <Route path="/admin/team/new" element={<TeamForm />} />
-          <Route path="/admin/team/:slug" element={<TeamForm />} />
+          <Route path="/admin/team/new" element={<AdminRoute><TeamForm /></AdminRoute>} />
+          <Route path="/admin/team/:slug" element={<AdminRoute><TeamForm /></AdminRoute>} />
           
           {/* Legacy Routes (kept for compatibility) */}
-          <Route path="/admin/projects/:slug" element={<PortfolioEditLegacy />} />
-          <Route path="/admin/team-member/:slug" element={<TeamEditLegacy />} />
+          <Route path="/admin/projects/:slug" element={<AdminRoute><PortfolioEditLegacy /></AdminRoute>} />
+          <Route path="/admin/team-member/:slug" element={<AdminRoute><TeamEditLegacy /></AdminRoute>} />
           
           {/* 404 Route */}
           <Route

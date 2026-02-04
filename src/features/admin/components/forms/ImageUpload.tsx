@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, X, ImageIcon, Loader2, GripVertical } from 'lucide-react';
+import { toast } from 'sonner';
+import { uploadFile } from '@/lib/supabase';
 
 interface ImageUploadProps {
   value: string;
@@ -39,14 +41,26 @@ export function ImageUpload({
 
   const processFile = async (file: File) => {
     setIsLoading(true);
-    
-    // Simulate upload delay - replace with actual upload to Supabase/S3
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For now, create object URL (in production, upload to storage)
-    const url = URL.createObjectURL(file);
-    onChange(url);
-    setIsLoading(false);
+
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'png';
+      const uuid = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2);
+      const path = `images/${Date.now()}-${uuid}.${ext}`;
+      const url = await uploadFile('media', path, file);
+
+      if (!url) {
+        toast.error('Failed to upload image');
+        return;
+      }
+
+      onChange(url);
+    } catch (error) {
+      toast.error('Failed to upload image');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDrop = async (e: React.DragEvent) => {
@@ -199,10 +213,22 @@ export function GalleryImages({ images, onChange, label = 'Gallery Images' }: Ga
     const files = Array.from(e.target.files || []);
     
     for (const file of files) {
-      // Simulate upload - replace with actual upload
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const url = URL.createObjectURL(file);
-      onChange([...images, url]);
+      try {
+        const ext = file.name.split('.').pop()?.toLowerCase() || 'png';
+        const uuid = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2);
+        const path = `gallery/${Date.now()}-${uuid}.${ext}`;
+        const url = await uploadFile('media', path, file);
+
+        if (url) {
+          onChange([...images, url]);
+        } else {
+          toast.error('Failed to upload image');
+        }
+      } catch {
+        toast.error('Failed to upload image');
+      }
     }
   };
 

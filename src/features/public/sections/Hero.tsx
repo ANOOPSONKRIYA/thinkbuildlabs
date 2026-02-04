@@ -42,15 +42,24 @@ export function Hero() {
   const [videoUrl, setVideoUrl] = useState<string>("");
 
   useEffect(() => {
-    setVideoUrl(getHeroVideoUrl());
-    
-    // Listen for settings changes
-    const handleStorage = () => {
-      setVideoUrl(getHeroVideoUrl());
+    let mounted = true;
+
+    const loadVideoUrl = async () => {
+      const url = await getHeroVideoUrl();
+      if (mounted) setVideoUrl(url);
     };
-    
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+
+    loadVideoUrl();
+
+    const handleSettingsUpdate = () => {
+      loadVideoUrl();
+    };
+
+    window.addEventListener('site-settings-updated', handleSettingsUpdate);
+    return () => {
+      mounted = false;
+      window.removeEventListener('site-settings-updated', handleSettingsUpdate);
+    };
   }, []);
 
   return (

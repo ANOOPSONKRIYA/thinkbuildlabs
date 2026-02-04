@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 import type { TeamMember, Education, Experience, Achievement, SocialLink, Project } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 
 
 // Admin components

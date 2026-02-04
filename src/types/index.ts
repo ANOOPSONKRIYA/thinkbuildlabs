@@ -141,12 +141,24 @@ export interface TeamMember {
 // Admin Types
 export interface AdminUser {
   id: string;
+  userId?: string;
   email: string;
   name: string;
   role: 'admin' | 'editor';
   avatar?: string;
   lastLogin: string;
   createdAt: string;
+}
+
+// Site Settings
+export interface SiteSettings {
+  id?: string;
+  siteName: string;
+  contactEmail: string;
+  heroVideoUrl: string;
+  isPrimary?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // About Page Types

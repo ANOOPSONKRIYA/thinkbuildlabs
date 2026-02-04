@@ -18,8 +18,10 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Project, TeamMember } from '@/types';
-import { mockDataService } from '@/lib/mockData';
-import { getSettings, saveSettings, type SiteSettings } from '@/lib/settings';
+import { mockDataService } from '@/lib/dataService';
+import { getSettings, saveSettings } from '@/lib/settings';
+import { signOut } from '@/lib/supabase';
+import type { SiteSettings } from '@/types';
 
 const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -185,7 +187,13 @@ export function Dashboard() {
             <ExternalLink className="w-4 sm:w-5 h-4 sm:h-5" />
             View Website
           </button>
-          <button className="w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-white/50 hover:text-white hover:bg-white/5 transition-all text-sm mt-1">
+          <button
+            onClick={async () => {
+              await signOut();
+              navigate('/');
+            }}
+            className="w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-white/50 hover:text-white hover:bg-white/5 transition-all text-sm mt-1"
+          >
             <LogOut className="w-4 sm:w-5 h-4 sm:h-5" />
             Sign Out
           </button>
@@ -664,22 +672,31 @@ function SettingsContent() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load settings from localStorage
-    const loaded = getSettings();
-    setSettings(loaded);
-    setIsLoading(false);
+    let mounted = true;
+
+    const loadSettings = async () => {
+      const loaded = await getSettings();
+      if (!mounted) return;
+      setSettings(loaded);
+      setIsLoading(false);
+    };
+
+    loadSettings();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleChange = (field: keyof SiteSettings, value: string) => {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    saveSettings(settings);
+  const handleSave = async () => {
+    await saveSettings(settings);
     toast.success('Settings saved successfully!');
-    
+
     // Notify other tabs/windows about the change
-    window.dispatchEvent(new StorageEvent('storage', { key: 'vlsi_site_settings' }));
+    window.dispatchEvent(new Event('site-settings-updated'));
   };
 
   if (isLoading) {

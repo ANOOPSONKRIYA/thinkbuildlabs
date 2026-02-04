@@ -13,7 +13,7 @@ import {
   X
 } from 'lucide-react';
 import type { TeamMember, Education, Experience, Achievement, SocialLink } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 
 const SOCIAL_PLATFORMS = [
   { value: 'linkedin', label: 'LinkedIn', icon: Linkedin },

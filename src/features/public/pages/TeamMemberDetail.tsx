@@ -19,7 +19,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import type { TeamMember, Project } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 
 export function TeamMemberDetail() {
   const { slug } = useParams<{ slug: string }>();

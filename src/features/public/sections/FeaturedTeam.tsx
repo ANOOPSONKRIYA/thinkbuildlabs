@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Github, Linkedin, Instagram } from 'lucide-react';
 import type { TeamMember } from '@/types';
-import { mockDataService } from '@/lib/mockData';
+import { mockDataService } from '@/lib/dataService';
 
 export function FeaturedTeam() {
   const [members, setMembers] = useState<TeamMember[]>([]);
