@@ -248,28 +248,75 @@ using (email = (auth.jwt() ->> 'email') or "userId" = auth.uid())
 with check (email = (auth.jwt() ->> 'email') or "userId" = auth.uid());
 
 -- Storage bucket and policies
-insert into storage.buckets (id, name, public)
-values ('media', 'media', true)
-on conflict (id) do nothing;
+-- Note: storage.objects is owned by supabase_storage_admin in hosted Supabase.
+-- If your SQL editor role isn't the owner, policy creation will fail.
+-- We wrap these in a DO block to avoid hard failures and surface notices instead.
 
-alter table storage.objects enable row level security;
+do $$
+begin
+  begin
+    insert into storage.buckets (id, name, public)
+    values ('media', 'media', true)
+    on conflict (id) do nothing;
+  exception when insufficient_privilege then
+    raise notice 'Skipping storage.buckets insert (insufficient privileges).';
+  end;
 
-create policy "Media public read"
-on storage.objects
-for select
-using (bucket_id = 'media');
+  begin
+    execute 'alter table storage.objects enable row level security';
+  exception when insufficient_privilege then
+    raise notice 'Skipping storage.objects RLS enable (insufficient privileges).';
+  end;
 
-create policy "Media admin insert"
-on storage.objects
-for insert
-with check (bucket_id = 'media' and public.is_admin());
+  begin
+    execute $pol$
+      create policy "Media public read"
+      on storage.objects
+      for select
+      using (bucket_id = 'media')
+    $pol$;
+  exception when duplicate_object then
+    raise notice 'Policy "Media public read" already exists.';
+  when insufficient_privilege then
+    raise notice 'Skipping policy "Media public read" (insufficient privileges).';
+  end;
 
-create policy "Media admin update"
-on storage.objects
-for update
-using (bucket_id = 'media' and public.is_admin());
+  begin
+    execute $pol$
+      create policy "Media admin insert"
+      on storage.objects
+      for insert
+      with check (bucket_id = 'media' and public.is_admin())
+    $pol$;
+  exception when duplicate_object then
+    raise notice 'Policy "Media admin insert" already exists.';
+  when insufficient_privilege then
+    raise notice 'Skipping policy "Media admin insert" (insufficient privileges).';
+  end;
 
-create policy "Media admin delete"
-on storage.objects
-for delete
-using (bucket_id = 'media' and public.is_admin());
+  begin
+    execute $pol$
+      create policy "Media admin update"
+      on storage.objects
+      for update
+      using (bucket_id = 'media' and public.is_admin())
+    $pol$;
+  exception when duplicate_object then
+    raise notice 'Policy "Media admin update" already exists.';
+  when insufficient_privilege then
+    raise notice 'Skipping policy "Media admin update" (insufficient privileges).';
+  end;
+
+  begin
+    execute $pol$
+      create policy "Media admin delete"
+      on storage.objects
+      for delete
+      using (bucket_id = 'media' and public.is_admin())
+    $pol$;
+  exception when duplicate_object then
+    raise notice 'Policy "Media admin delete" already exists.';
+  when insufficient_privilege then
+    raise notice 'Skipping policy "Media admin delete" (insufficient privileges).';
+  end;
+end $$;

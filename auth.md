@@ -66,7 +66,34 @@ https://your-domain.com/admin
 ```
 
 ## 5) Storage Bucket
-The migration creates a public `media` bucket and policies. No extra setup is required.
+The migration attempts to create a public `media` bucket and policies. On hosted Supabase,
+policy creation can fail in SQL Editor due to `storage.objects` ownership.
+
+If you see notices about skipped storage policies, create them manually in:
+Supabase → Storage → Policies → `storage.objects`.
+
+Use these policies (SQL):
+```sql
+create policy "Media public read"
+on storage.objects
+for select
+using (bucket_id = 'media');
+
+create policy "Media admin insert"
+on storage.objects
+for insert
+with check (bucket_id = 'media' and public.is_admin());
+
+create policy "Media admin update"
+on storage.objects
+for update
+using (bucket_id = 'media' and public.is_admin());
+
+create policy "Media admin delete"
+on storage.objects
+for delete
+using (bucket_id = 'media' and public.is_admin());
+```
 
 Uploads from the admin panel will be stored in:
 ```
