@@ -4,6 +4,25 @@
 -- - Public can still read public projects
 -- - Team member creation stays admin-only
 
+-- Helper: member check (copied to avoid dependency on earlier migrations)
+create or replace function public.is_project_member(project_team_members uuid[])
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.team_members tm
+    where tm.id = any(project_team_members)
+      and (
+        tm."userId" = auth.uid()
+        or tm.email = (auth.jwt() ->> 'email')
+      )
+  );
+$$;
+
 -- Helper: allow admin override while keeping member assignment checks
 create or replace function public.project_access_guard(project_team_members uuid[])
 returns boolean

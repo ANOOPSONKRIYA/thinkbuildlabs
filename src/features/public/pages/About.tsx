@@ -80,7 +80,7 @@ export function About() {
             About Us
           </span>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
-            VLSI & AI Robotics Lab
+            thinkbuildlabs
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-white/50 max-w-3xl mx-auto">
             {aboutData.description}

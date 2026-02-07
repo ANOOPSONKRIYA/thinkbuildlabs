@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import type { SiteSettings } from '@/types';
 
 const DEFAULT_SETTINGS: SiteSettings = {
-  siteName: 'VLSI & AI Robotics Lab',
+  siteName: 'thinkbuildlabs',
   contactEmail: 'contact@lab.edu',
   contactPhone: '+1 (555) 123-4567',
   contactAddress: 'Engineering Building, Room 405\nUniversity Campus, CA 94305',

@@ -125,7 +125,7 @@ export function Footer() {
                 <Cpu className="w-6 h-6 text-black" />
               </div>
               <span className="font-bold text-xl text-white">
-                {settings?.siteName || 'VLSI & AI Lab'}
+                {settings?.siteName || 'thinkbuildlabs'}
               </span>
             </Link>
             <p className="text-white/50 text-sm leading-relaxed mb-4 sm:mb-6">
@@ -216,12 +216,12 @@ export function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-white/30 text-xs sm:text-sm text-center sm:text-left">
-              (c) {new Date().getFullYear()} {settings?.siteName || 'VLSI & AI Robotics Lab'}. All rights reserved.
+              (c) {new Date().getFullYear()} {settings?.siteName || 'thinkbuildlabs'}. All rights reserved.
             </p>
             
             {/* Developer Credit */}
             <a 
-              href="http://anoopsonkriya.vercel.app/"
+              href="https://thinkbuildlabs.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all"

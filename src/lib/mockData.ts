@@ -82,7 +82,7 @@ export const mockProjects: Project[] = [
     demoUrl: 'https://demo.neurochip.ai',
     documentationUrl: 'https://docs.neurochip.ai',
     researchPaperUrl: 'https://arxiv.org/abs/2301.00001',
-    metaTitle: 'NeuroChip: Neural Network Accelerator | VLSI Lab',
+    metaTitle: 'NeuroChip: Neural Network Accelerator | thinkbuildlabs',
     metaDescription: 'A 28nm CMOS implementation of a spiking neural network optimized for edge computing applications.',
     keywords: ['VLSI', 'Neural Network', 'ASIC', 'Edge Computing', 'Low Power'],
     createdAt: '2023-01-15T00:00:00Z',
@@ -636,7 +636,7 @@ export const mockAboutData: AboutData = {
   id: '1',
   mission: 'To advance the frontiers of VLSI design and AI robotics through innovative research, collaborative learning, and practical application.',
   vision: 'Becoming a world-leading research lab that bridges the gap between cutting-edge semiconductor technology and intelligent robotic systems.',
-  description: 'The VLSI & AI Robotics Lab is a multidisciplinary research group at the intersection of chip design, artificial intelligence, and robotics. Founded in 2018, our lab brings together students and researchers from electrical engineering, computer science, and mechanical engineering to tackle challenging problems in next-generation computing and autonomous systems.\n\nOur research spans from the transistor level to complete robotic systems. We design custom silicon for AI acceleration, develop algorithms for robot perception and control, and build complete robotic platforms that showcase our technologies in real-world scenarios.',
+  description: 'thinkbuildlabs is a multidisciplinary research group at the intersection of chip design, artificial intelligence, and robotics. Founded in 2018, our lab brings together students and researchers from electrical engineering, computer science, and mechanical engineering to tackle challenging problems in next-generation computing and autonomous systems.\n\nOur research spans from the transistor level to complete robotic systems. We design custom silicon for AI acceleration, develop algorithms for robot perception and control, and build complete robotic platforms that showcase our technologies in real-world scenarios.',
   stats: [
     { id: 's1', label: 'Projects Completed', value: '25+', icon: 'CheckCircle' },
     { id: 's2', label: 'Research Papers', value: '40+', icon: 'FileText' },
@@ -648,7 +648,7 @@ export const mockAboutData: AboutData = {
       id: 'h1',
       year: '2018',
       title: 'Lab Founded',
-      description: 'The VLSI & AI Robotics Lab was established with initial funding from the National Science Foundation.'
+      description: 'thinkbuildlabs was established with initial funding from the National Science Foundation.'
     },
     {
       id: 'h2',

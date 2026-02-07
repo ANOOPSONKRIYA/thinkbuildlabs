@@ -99,11 +99,10 @@ export default function GlassmorphismTrustHero() {
                 WebkitMaskImage: "linear-gradient(180deg, black 0%, black 80%, transparent 100%)"
               }}
             >
-              VLSI & AI<br />
+              thinkbuild<br />
               <span className="text-zinc-400">
-                Robotics
-              </span><br />
-              Lab
+                labs
+              </span>
             </h1>
 
             {/* Description */}

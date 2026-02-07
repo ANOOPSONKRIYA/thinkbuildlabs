@@ -54,7 +54,7 @@ export function Navigation() {
             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
               <Cpu className="w-5 h-5 text-black" />
             </div>
-            <span className="font-semibold text-white whitespace-nowrap">VLSI & AI Lab</span>
+            <span className="font-semibold text-white whitespace-nowrap">thinkbuildlabs</span>
           </Link>
 
           {/* Navigation Links */}
@@ -102,7 +102,7 @@ export function Navigation() {
               <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
                 <Cpu className="w-5 h-5 text-black" />
               </div>
-              <span className="font-semibold text-white text-sm">VLSI & AI Lab</span>
+              <span className="font-semibold text-white text-sm">thinkbuildlabs</span>
             </Link>
 
             {/* Mobile Menu Button */}

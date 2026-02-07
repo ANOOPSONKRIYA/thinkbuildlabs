@@ -126,7 +126,7 @@ export function SettingsPage() {
                   type="text"
                   value={settings.siteName}
                   onChange={(e) => handleChange('siteName', e.target.value)}
-                  placeholder="VLSI & AI Robotics Lab"
+                  placeholder="thinkbuildlabs"
                   className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-white/20"
                 />
               </div>

@@ -136,7 +136,7 @@ npm run dev
 If `site_settings` is empty, the UI uses defaults. You can insert a row:
 ```sql
 insert into public.site_settings ("siteName", "contactEmail", "heroVideoUrl")
-values ('VLSI & AI Robotics Lab', 'contact@lab.edu', 'https://example.com/hero.mp4');
+values ('thinkbuildlabs', 'contact@lab.edu', 'https://example.com/hero.mp4');
 ```
 
 ## 9) Optional: Seed About Page Data
