@@ -24,7 +24,7 @@ export function CollapsibleSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-2xl bg-white/[0.02] border border-white/10 overflow-hidden">
+    <div className="rounded-2xl bg-white/[0.02] border border-white/10">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}

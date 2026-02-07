@@ -12,7 +12,17 @@ import { Navigation, Footer, LightBeams, NoiseOverlay, ScrollToTop } from '@/com
 import { Home, Portfolio, ProjectDetail, Team, TeamMemberDetail, About } from '@/features/public/pages';
 
 // Admin Pages
-import { Dashboard, PortfolioForm, TeamForm, PortfolioEditLegacy, TeamEditLegacy } from '@/features/admin/pages';
+import { 
+  Dashboard, 
+  ProjectsPage, 
+  TeamPage, 
+  LogsPage, 
+  SettingsPage,
+  PortfolioForm, 
+  TeamForm, 
+  PortfolioEditLegacy, 
+  TeamEditLegacy 
+} from '@/features/admin/pages';
 import { AdminGate } from '@/features/admin/components/AdminGate';
 
 // Member Pages
@@ -170,10 +180,10 @@ function App() {
           
           {/* Admin Routes - Wrapped with AdminLayout */}
           <Route path="/admin" element={<AdminRoute><Dashboard /></AdminRoute>} />
-          <Route path="/admin/team" element={<AdminRoute><Dashboard /></AdminRoute>} />
-          <Route path="/admin/projects" element={<AdminRoute><Dashboard /></AdminRoute>} />
-          <Route path="/admin/logs" element={<AdminRoute><Dashboard /></AdminRoute>} />
-          <Route path="/admin/settings" element={<AdminRoute><Dashboard /></AdminRoute>} />
+          <Route path="/admin/projects" element={<AdminRoute><ProjectsPage /></AdminRoute>} />
+          <Route path="/admin/team" element={<AdminRoute><TeamPage /></AdminRoute>} />
+          <Route path="/admin/logs" element={<AdminRoute><LogsPage /></AdminRoute>} />
+          <Route path="/admin/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />
           
           {/* Portfolio Admin Forms with Sidebar */}
           <Route path="/admin/portfolio/new" element={<AdminRoute><PortfolioForm /></AdminRoute>} />

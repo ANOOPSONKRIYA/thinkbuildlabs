@@ -69,7 +69,7 @@ export function MemberLayout({
   const pageTitle = title || activeItem?.label || 'Member Portal';
 
   return (
-    <div className="min-h-screen bg-[#050505] flex">
+    <div className="h-screen bg-[#050505] flex overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -83,11 +83,11 @@ export function MemberLayout({
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 member-sidebar border-r border-white/10 flex-shrink-0 transition-transform duration-300 ${
+      {/* Sidebar - Fixed */}
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 member-sidebar border-r border-white/10 flex-shrink-0 transition-transform duration-300 flex flex-col h-full ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
-        <div className="p-4 sm:p-6">
+        <div className="p-4 sm:p-6 flex-shrink-0">
           {/* Logo/Brand */}
           <div className="flex items-center gap-3 mb-6 sm:mb-8">
             <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 flex items-center justify-center">
@@ -142,7 +142,7 @@ export function MemberLayout({
           </nav>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 border-t border-white/10">
+        <div className="mt-auto p-4 sm:p-6 border-t border-white/10 flex-shrink-0">
           <button 
             onClick={() => window.open(`/team/${member?.slug}`, '_blank')}
             className="w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-white/50 hover:text-white hover:bg-white/5 transition-all text-sm"
@@ -164,9 +164,9 @@ export function MemberLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto min-w-0 flex flex-col">
-        {/* Header */}
-        <header className="sticky top-0 z-30 glass-strong border-b border-white/10 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {/* Header - Fixed */}
+        <header className="flex-shrink-0 z-30 glass-strong border-b border-white/10 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <button
@@ -214,8 +214,8 @@ export function MemberLayout({
           </div>
         </header>
 
-        {/* Page Content */}
-        <div className="flex-1">
+        {/* Page Content - Scrollable */}
+        <div className="flex-1 overflow-auto">
           {children}
         </div>
       </main>

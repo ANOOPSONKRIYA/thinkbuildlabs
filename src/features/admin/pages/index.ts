@@ -1,4 +1,8 @@
 export { Dashboard } from './Dashboard';
+export { ProjectsPage } from './ProjectsPage';
+export { TeamPage } from './TeamPage';
+export { LogsPage } from './LogsPage';
+export { SettingsPage } from './SettingsPage';
 export { PortfolioForm } from './PortfolioForm';
 export { TeamForm } from './TeamForm';
 export { PortfolioEditLegacy } from './PortfolioEditLegacy';
