@@ -110,14 +110,23 @@ export async function getProjectsByOwner(ownerId: string): Promise<Project[]> {
   return data || [];
 }
 
-export async function getProjectsForMember(memberId: string): Promise<Project[]> {
-  if (!memberId) return [];
+export async function getProjectsForMember(memberId: string, userId?: string): Promise<Project[]> {
+  if (!memberId && !userId) return [];
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('projects')
     .select('*')
-    .contains('teamMembers', [memberId])
     .order('createdAt', { ascending: false });
+
+  if (memberId && userId) {
+    query = query.or(`ownerId.eq.${userId},teamMembers.cs.{${memberId}}`);
+  } else if (userId) {
+    query = query.eq('ownerId', userId);
+  } else if (memberId) {
+    query = query.contains('teamMembers', [memberId]);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching assigned projects:', error);

@@ -7,6 +7,7 @@ import {
   Mail,
   Phone,
   Link,
+  Download,
   GraduationCap,
   Briefcase,
   Trophy,
@@ -22,7 +23,7 @@ import {
   X,
 } from 'lucide-react';
 
-import type { TeamMember, Education, Experience, Achievement, SocialLink, Project } from '@/types';
+import type { TeamMember, Education, Experience, Achievement, SocialLink, Project, Resume } from '@/types';
 import { mockDataService } from '@/lib/dataService';
 import { useMemberSession } from '@/features/member/context/MemberContext';
 
@@ -147,6 +148,19 @@ export function MemberProfileForm() {
   // Handlers
   const handleChange = <K extends keyof TeamMember>(field: K, value: TeamMember[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const updateResume = (updates: Partial<Resume>) => {
+    setFormData((prev) => {
+      const base = prev.resume || { url: '', filename: '', uploadedAt: new Date().toISOString() };
+      const next = { ...base, ...updates };
+      const hasUrl = (next.url || '').trim().length > 0;
+
+      return {
+        ...prev,
+        resume: hasUrl ? { ...next, uploadedAt: next.uploadedAt || new Date().toISOString() } : undefined,
+      };
+    });
   };
 
   const handleSave = async (_asDraft = false) => {
@@ -600,6 +614,33 @@ export function MemberProfileForm() {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Resume link */}
+              <div className="pt-4 border-t border-white/5">
+                <label className="flex items-center gap-2 text-white/60 text-sm mb-3">
+                  <Download className="w-4 h-4" />
+                  Resume (Google Drive link)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <input
+                    type="url"
+                    value={formData.resume?.url || ''}
+                    onChange={(e) => updateResume({ url: e.target.value })}
+                    placeholder="https://drive.google.com/..."
+                    className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-white/20"
+                  />
+                  <input
+                    type="text"
+                    value={formData.resume?.filename || ''}
+                    onChange={(e) => updateResume({ filename: e.target.value })}
+                    placeholder="Button label (e.g., Resume.pdf)"
+                    className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-white/20"
+                  />
+                  <p className="text-white/40 text-xs sm:text-sm">
+                    Paste a shareable Google Drive link. The label is optional.
+                  </p>
                 </div>
               </div>
             </div>

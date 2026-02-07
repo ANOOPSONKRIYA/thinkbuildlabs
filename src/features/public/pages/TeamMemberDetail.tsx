@@ -184,14 +184,16 @@ export function TeamMemberDetail() {
               </div>
 
               {/* Resume Download */}
-              {member.resume && (
+              {member.resume?.url && (
                 <a
                   href={member.resume.url}
-                  download={member.resume.filename}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-white text-black font-medium rounded-full hover:bg-zinc-200 transition-colors text-xs sm:text-sm"
+                  title="Open resume (Google Drive or external link)"
                 >
                   <Download className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
-                  Resume
+                  {member.resume.filename || 'Resume'}
                 </a>
               )}
             </div>

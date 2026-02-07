@@ -18,14 +18,14 @@ export function MemberDashboard() {
 
   const fetchProjects = async () => {
     setLoading(true);
-    const data = await getProjectsForMember(member.id);
+    const data = await getProjectsForMember(member.id, user.id);
     setProjects(data);
     setLoading(false);
   };
 
   useEffect(() => {
     fetchProjects();
-  }, [member.id]);
+  }, [member.id, user.id]);
 
   const handleDeleteProject = async (id: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
