@@ -17,6 +17,7 @@ Apply all migrations:
 - `supabase/migrations/20260204190000_init.sql`
 - `supabase/migrations/20260205120000_member_portal.sql`
 - `supabase/migrations/20260205193000_activity_logs_and_settings.sql`
+- `supabase/migrations/20260207213000_fix_activity_logs_access.sql`
 
 You can do this in two ways:
 1. Supabase CLI:

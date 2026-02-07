@@ -12,23 +12,31 @@ export async function logAdminAction(payload: LogPayload) {
 
   const actorName = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Unknown Admin';
 
-  await createActivityLog({
+  const ok = await createActivityLog({
     actorId: user.id,
     actorName,
     actorEmail: user.email || undefined,
     actorRole: 'admin',
     ...payload,
   });
+
+  if (!ok) {
+    console.warn('Failed to write admin activity log', payload);
+  }
 }
 
 export async function logMemberAction(payload: LogPayload, user: User, member: TeamMember) {
   if (!user || !member) return;
 
-  await createActivityLog({
+  const ok = await createActivityLog({
     actorId: user.id,
     actorName: member.name || user.email || 'Unknown Member',
     actorEmail: member.email || user.email || undefined,
     actorRole: 'member',
     ...payload,
   });
+
+  if (!ok) {
+    console.warn('Failed to write member activity log', payload);
+  }
 }

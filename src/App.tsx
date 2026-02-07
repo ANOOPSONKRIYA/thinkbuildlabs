@@ -26,7 +26,7 @@ import {
 import { AdminGate } from '@/features/admin/components/AdminGate';
 
 // Member Pages
-import { MemberDashboard, MemberProjectForm, MemberProfileForm } from '@/features/member/pages';
+import { MemberDashboard, MemberProjectsPage, MemberProjectForm, MemberProfileForm } from '@/features/member/pages';
 import { MemberGate } from '@/features/member/components/MemberGate';
 
 import './App.css';
@@ -199,6 +199,7 @@ function App() {
 
           {/* Member Routes - Wrapped with MemberLayout */}
           <Route path="/member" element={<MemberRoute><MemberDashboard /></MemberRoute>} />
+          <Route path="/member/projects" element={<MemberRoute><MemberProjectsPage /></MemberRoute>} />
           <Route path="/member/profile" element={<MemberRoute><MemberProfileForm /></MemberRoute>} />
           <Route path="/member/projects/new" element={<MemberRoute><MemberProjectForm /></MemberRoute>} />
           <Route path="/member/projects/:slug" element={<MemberRoute><MemberProjectForm /></MemberRoute>} />

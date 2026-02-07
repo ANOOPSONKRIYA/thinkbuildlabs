@@ -397,7 +397,10 @@ export async function signOut() {
 
 export async function getCurrentUser() {
   const { data: { user } } = await supabase.auth.getUser();
-  return user;
+  if (user) return user;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.user || null;
 }
 
 export async function getCurrentMember() {
@@ -454,18 +457,91 @@ export function subscribeToTeamMembers(callback: (payload: any) => void) {
     .subscribe();
 }
 
+type ActivityLogInsert = Omit<ActivityLog, 'id' | 'createdAt'>;
+
+type ActivityLogCompatRow = {
+  id?: string;
+  actorId?: string;
+  actor_id?: string;
+  actorName?: string;
+  actor_name?: string;
+  actorEmail?: string;
+  actor_email?: string;
+  actorRole?: 'admin' | 'member';
+  actor_role?: 'admin' | 'member';
+  action?: string;
+  entityType?: string;
+  entity_type?: string;
+  entityId?: string;
+  entity_id?: string;
+  entitySlug?: string;
+  entity_slug?: string;
+  entityName?: string;
+  entity_name?: string;
+  message?: string;
+  details?: Record<string, unknown>;
+  createdAt?: string;
+  created_at?: string;
+};
+
+function mapActivityLogRow(row: ActivityLogCompatRow): ActivityLog {
+  return {
+    id: row?.id || crypto.randomUUID(),
+    actorId: row?.actorId ?? row?.actor_id ?? undefined,
+    actorName: row?.actorName ?? row?.actor_name ?? undefined,
+    actorEmail: row?.actorEmail ?? row?.actor_email ?? undefined,
+    actorRole: row?.actorRole ?? row?.actor_role ?? undefined,
+    action: row?.action || 'unknown',
+    entityType: row?.entityType ?? row?.entity_type ?? 'unknown',
+    entityId: row?.entityId ?? row?.entity_id ?? undefined,
+    entitySlug: row?.entitySlug ?? row?.entity_slug ?? undefined,
+    entityName: row?.entityName ?? row?.entity_name ?? undefined,
+    message: row?.message ?? undefined,
+    details: row?.details ?? {},
+    createdAt: row?.createdAt ?? row?.created_at ?? new Date().toISOString(),
+  };
+}
+
 // Activity Logs
-export async function createActivityLog(entry: Omit<ActivityLog, 'id' | 'createdAt'>) {
+export async function createActivityLog(entry: ActivityLogInsert): Promise<boolean> {
+  const normalizedEntry = {
+    ...entry,
+    details: entry.details || {},
+  };
+
   const { error } = await supabase
     .from('activity_logs')
-    .insert({
-      ...entry,
-      details: entry.details || {},
-    });
+    .insert(normalizedEntry);
 
-  if (error) {
-    console.error('Error creating activity log:', error);
+  if (!error) {
+    return true;
   }
+
+  // Backward compatibility: some DBs may have snake_case columns.
+  const fallbackEntry = {
+    actor_id: normalizedEntry.actorId ?? null,
+    actor_name: normalizedEntry.actorName ?? null,
+    actor_email: normalizedEntry.actorEmail ?? null,
+    actor_role: normalizedEntry.actorRole ?? null,
+    action: normalizedEntry.action,
+    entity_type: normalizedEntry.entityType,
+    entity_id: normalizedEntry.entityId ?? null,
+    entity_slug: normalizedEntry.entitySlug ?? null,
+    entity_name: normalizedEntry.entityName ?? null,
+    message: normalizedEntry.message ?? null,
+    details: normalizedEntry.details,
+  };
+
+  const { error: fallbackError } = await supabase
+    .from('activity_logs')
+    .insert(fallbackEntry as Record<string, unknown>);
+
+  if (fallbackError) {
+    console.error('Error creating activity log:', fallbackError);
+    return false;
+  }
+
+  return true;
 }
 
 export async function getActivityLogs(limit = 200): Promise<ActivityLog[]> {
@@ -475,10 +551,21 @@ export async function getActivityLogs(limit = 200): Promise<ActivityLog[]> {
     .order('createdAt', { ascending: false })
     .limit(limit);
 
-  if (error) {
-    console.error('Error fetching activity logs:', error);
+  if (!error) {
+    return (data || []).map(mapActivityLogRow);
+  }
+
+  // Backward compatibility: some DBs may have snake_case columns.
+  const { data: fallbackData, error: fallbackError } = await supabase
+    .from('activity_logs')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (fallbackError) {
+    console.error('Error fetching activity logs:', fallbackError);
     return [];
   }
 
-  return data || [];
+  return (fallbackData || []).map(mapActivityLogRow);
 }
