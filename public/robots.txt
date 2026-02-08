@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://thinkbuildlabs.com/sitemap.xml
+Sitemap: https://thinkbuildlabs.vercel/sitemap.xml
 
 # Crawl rate (optional, helps manage server load)
 Crawl-delay: 1
