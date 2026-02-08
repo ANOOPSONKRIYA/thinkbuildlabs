@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import type { AboutData, Partner } from '@/types';
 import { mockDataService } from '@/lib/dataService';
+import { AboutGallerySection } from '@/components/blocks/about-gallery-section';
 
 // Partner logos using Lucide icons
 const PARTNER_ICONS = [
@@ -223,36 +224,13 @@ export function About() {
           </div>
         </motion.section>
 
-        {/* Gallery */}
-        {aboutData.gallery?.length > 0 && (
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="mb-10 sm:mb-16"
-          >
-            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 sm:mb-8 text-center">Lab Gallery</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {aboutData.gallery.map((image, index) => (
-                <motion.div
-                  key={`${image}-${index}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="relative group rounded-2xl overflow-hidden glass card-hover"
-                >
-                  <img
-                    src={image}
-                    alt={`Gallery ${index + 1}`}
-                    className="w-full h-56 sm:h-64 object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity" />
-                </motion.div>
-              ))}
-            </div>
-          </motion.section>
-        )}
+        {/* Gallery - Circular Carousel */}
+        <AboutGallerySection 
+          gallery={aboutData.gallery}
+          title="Our Space"
+          subtitle="Where Innovation Happens"
+          description="Take a glimpse into our state-of-the-art facilities where ideas transform into breakthrough technologies. From advanced research labs to collaborative workspaces, every corner is designed to inspire creativity."
+        />
 
         {/* Partners */}
         <motion.section
