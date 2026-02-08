@@ -14,6 +14,7 @@ import {
   Globe,
   ExternalLink as ExternalLinkIcon,
   FileDigit,
+  Star,
   Save,
   X,
 } from 'lucide-react';
@@ -33,6 +34,7 @@ import { TimelineEditor } from '@/features/admin/components/forms/TimelineEditor
 import { TeamMemberSelect } from '@/features/admin/components/forms/TeamMemberSelect';
 import { MetaFields } from '@/features/admin/components/forms/MetaFields';
 import { logMemberAction } from '@/lib/activityLogs';
+import { deleteProjectMedia } from '@/lib/supabase';
 
 export function MemberProjectForm() {
   const { slug } = useParams<{ slug: string }>();
@@ -55,6 +57,7 @@ export function MemberProjectForm() {
     category: 'vlsi',
     status: 'draft',
     visibility: 'public',
+    isFeatured: false,
     thumbnail: '',
     coverImage: '',
     images: [],
@@ -104,10 +107,11 @@ export function MemberProjectForm() {
           const ensuredTeamMembers = ensureSelfInTeam(project.teamMembers || [], project.teamMemberRoles || []);
           setFormData({
             ...project,
+            isFeatured: project.isFeatured ?? false,
             teamMembers: ensuredTeamMembers.ids,
             teamMemberRoles: ensuredTeamMembers.roles,
           });
-          setOriginalData(JSON.stringify(project));
+          setOriginalData(JSON.stringify({ ...project, isFeatured: project.isFeatured ?? false }));
         }
       } catch (error) {
         toast.error('Failed to load data');
@@ -176,6 +180,7 @@ export function MemberProjectForm() {
       const normalizedEndDate = formData.endDate?.trim() ? formData.endDate : undefined;
       const dataToSave = {
         ...formData,
+        isFeatured: formData.isFeatured ?? false,
         ownerId: isNew ? user.id : formData.ownerId,
         teamMembers: ensuredTeam.ids,
         teamMemberRoles: ensuredTeam.roles,
@@ -260,7 +265,10 @@ export function MemberProjectForm() {
   const handleDelete = async () => {
     if (!formData.id) return;
 
+    if (!confirm('Are you sure you want to delete this project?')) return;
+
     try {
+      await deleteProjectMedia(formData as Project);
       await mockDataService.deleteProject(formData.id);
       toast.success('Project deleted successfully!');
       await logMemberAction(
@@ -420,7 +428,7 @@ export function MemberProjectForm() {
               currentSlug={isEdit ? formData.slug : undefined}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div>
                 <label className="block text-white/60 text-sm mb-1.5">Category</label>
                 <div className="relative">
@@ -481,8 +489,29 @@ export function MemberProjectForm() {
                         {v.label}
                       </option>
                     ))}
-                  </select>
+                    </select>
+                  </div>
                 </div>
+              <div>
+                <label className="block text-white/60 text-sm mb-1.5">Featured</label>
+                <button
+                  type="button"
+                  onClick={() => handleChange('isFeatured', !formData.isFeatured)}
+                  className={`w-full px-3 py-2 rounded-lg border text-sm flex items-center justify-between transition-all ${
+                    formData.isFeatured
+                      ? 'bg-amber-500/20 border-amber-500/40 text-amber-200'
+                      : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20'
+                  }`}
+                >
+                  <span>{formData.isFeatured ? 'Started / Featured' : 'Mark as Started'}</span>
+                  <Star
+                    className="w-4 h-4"
+                    fill={formData.isFeatured ? 'currentColor' : 'none'}
+                  />
+                </button>
+                <p className="text-white/30 text-xs mt-1">
+                  Started projects appear in the home page Featured section.
+                </p>
               </div>
             </div>
 

@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Activity,
   ArrowLeft,
+  Info,
 } from 'lucide-react';
 import { signOut } from '@/lib/supabase';
 
@@ -29,6 +30,7 @@ const sidebarItems = [
   { id: 'projects', label: 'Projects', icon: FolderOpen, path: '/admin/projects' },
   { id: 'team', label: 'Team Members', icon: Users, path: '/admin/team' },
   { id: 'logs', label: 'Activity Logs', icon: Activity, path: '/admin/logs' },
+  { id: 'about', label: 'About Page', icon: Info, path: '/admin/about' },
   { id: 'settings', label: 'Settings', icon: Settings, path: '/admin/settings' },
 ];
 
@@ -51,6 +53,7 @@ export function AdminLayout({
     if (matchPath('/admin/team/*', path)) return 'team';
     if (matchPath('/admin/portfolio/*', path)) return 'projects';
     if (matchPath('/admin/projects/*', path)) return 'projects';
+    if (path.includes('/admin/about')) return 'about';
     if (path.includes('/logs')) return 'logs';
     if (path.includes('/settings')) return 'settings';
     return 'dashboard';

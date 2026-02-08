@@ -70,6 +70,7 @@ export function MemberProfileForm() {
   // Form state
   const [formData, setFormData] = useState<Partial<TeamMember>>({
     ...member,
+    isFeatured: member.isFeatured ?? false,
     socialLinks: member.socialLinks || [],
     skills: member.skills || [],
     projects: member.projects || [],
@@ -95,6 +96,7 @@ export function MemberProfileForm() {
 
         setFormData({
           ...member,
+          isFeatured: member.isFeatured ?? false,
           socialLinks: member.socialLinks || [],
           skills: member.skills || [],
           projects: member.projects || [],

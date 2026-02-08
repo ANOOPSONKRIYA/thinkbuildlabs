@@ -47,6 +47,7 @@ export function PortfolioEditLegacy() {
     techStack: [],
     timeline: [],
     teamMembers: [],
+    isFeatured: false,
     status: 'ongoing',
     startDate: '',
     endDate: '',
@@ -64,7 +65,7 @@ export function PortfolioEditLegacy() {
       const fetchProject = async () => {
         const project = await mockDataService.getProjectBySlug(slug);
         if (project) {
-          setFormData(project);
+          setFormData({ ...project, isFeatured: project.isFeatured ?? false });
         }
         setLoading(false);
       };
@@ -77,6 +78,7 @@ export function PortfolioEditLegacy() {
     
     const dataToSave = {
       ...formData,
+      isFeatured: formData.isFeatured ?? false,
       slug: formData.slug || formData.title?.toLowerCase().replace(/\s+/g, '-'),
     } as Omit<Project, 'id' | 'createdAt' | 'updatedAt'>;
 

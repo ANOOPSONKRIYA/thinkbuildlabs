@@ -10,6 +10,7 @@ import {
   updateTeamMember,
   deleteTeamMember,
   getAboutData,
+  saveAboutData,
 } from '@/lib/supabase';
 
 // Keep the same interface name used across the app,
@@ -31,4 +32,5 @@ export const mockDataService = {
 
   // About
   getAboutData,
+  saveAboutData,
 };

@@ -48,6 +48,7 @@ export interface Project {
   documentationUrl?: string;
   researchPaperUrl?: string;
   externalLinks?: ExternalLink[];
+  isFeatured: boolean;
   // Meta & SEO
   metaTitle?: string;
   metaDescription?: string;
@@ -129,6 +130,7 @@ export interface TeamMember {
   achievements: Achievement[];
   isActive: boolean;
   status: 'active' | 'inactive' | 'alumni';
+  isFeatured: boolean;
   joinedAt: string;
   leftAt?: string;
   memberSince?: string;
@@ -194,6 +196,7 @@ export interface AboutData {
   history: HistoryEvent[];
   facilities: Facility[];
   partners: Partner[];
+  gallery: string[];
 }
 
 export interface Stat {
@@ -208,6 +211,7 @@ export interface HistoryEvent {
   year: string;
   title: string;
   description: string;
+  milestone?: boolean;
 }
 
 export interface Facility {

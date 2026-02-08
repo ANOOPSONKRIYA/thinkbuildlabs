@@ -12,8 +12,9 @@ export function FeaturedTeam() {
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const data = await mockDataService.getTeamMembers();
-      setMembers(data.slice(0, 4));
+      const featured = await mockDataService.getTeamMembers({ featuredOnly: true });
+      const source = featured.length > 0 ? featured : await mockDataService.getTeamMembers();
+      setMembers(source.slice(0, 4));
       setLoading(false);
     };
     fetchMembers();

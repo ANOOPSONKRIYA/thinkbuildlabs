@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import type { TeamMember } from '@/types';
 import { mockDataService } from '@/lib/dataService';
+import { deleteTeamMemberMedia } from '@/lib/supabase';
 import { logAdminAction } from '@/lib/activityLogs';
 import { AdminLayout } from '@/features/admin/components/AdminLayout';
 
@@ -30,6 +31,9 @@ export function TeamPage() {
 
     try {
       const member = members.find((m) => m.id === id);
+      if (member) {
+        await deleteTeamMemberMedia(member);
+      }
       await mockDataService.deleteTeamMember(id);
       toast.success('Team member deleted successfully');
       await logAdminAction({
@@ -43,6 +47,26 @@ export function TeamPage() {
       fetchMembers();
     } catch (error) {
       toast.error('Failed to delete team member');
+    }
+  };
+
+  const handleToggleFeatured = async (member: TeamMember) => {
+    try {
+      const next = !member.isFeatured;
+      await mockDataService.updateTeamMember(member.id, { isFeatured: next });
+      toast.success(next ? 'Member starred for home page' : 'Removed from featured members');
+      await logAdminAction({
+        action: next ? 'feature' : 'unfeature',
+        entityType: 'team_member',
+        entityId: member.id,
+        entitySlug: member.slug,
+        entityName: member.name,
+        message: `${next ? 'Started' : 'Unstarted'} member "${member.name}"`,
+        details: { isFeatured: next },
+      });
+      fetchMembers();
+    } catch (error) {
+      toast.error('Failed to update member');
     }
   };
 
@@ -104,7 +128,12 @@ export function TeamPage() {
                           className="w-8 sm:w-10 h-8 sm:h-10 rounded-full object-cover"
                         />
                         <div>
-                          <p className="text-white text-xs sm:text-sm font-medium truncate max-w-[120px] sm:max-w-none">{member.name}</p>
+                          <div className="flex items-center gap-1">
+                            <p className="text-white text-xs sm:text-sm font-medium truncate max-w-[120px] sm:max-w-none">{member.name}</p>
+                            {member.isFeatured && (
+                              <Star className="w-3.5 h-3.5 text-amber-300" fill="currentColor" />
+                            )}
+                          </div>
                           <p className="text-white/30 text-[10px] sm:text-xs">/{member.slug}</p>
                         </div>
                       </div>
@@ -130,6 +159,18 @@ export function TeamPage() {
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center justify-end gap-1 sm:gap-2">
+                        <button
+                          onClick={() => handleToggleFeatured(member)}
+                          className={`p-1.5 sm:p-2 rounded-lg hover:bg-white/10 transition-colors ${
+                            member.isFeatured ? 'text-amber-300' : 'text-white/40 hover:text-white'
+                          }`}
+                          title={member.isFeatured ? 'Unstart member' : 'Start / feature member'}
+                        >
+                          <Star
+                            className="w-3.5 sm:w-4 h-3.5 sm:h-4"
+                            fill={member.isFeatured ? 'currentColor' : 'none'}
+                          />
+                        </button>
                         <button
                           onClick={() => window.open(`/team/${member.slug}`, '_blank')}
                           className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"

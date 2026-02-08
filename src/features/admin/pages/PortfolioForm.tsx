@@ -15,6 +15,7 @@ import {
   Lock,
   ExternalLink as ExternalLinkIcon,
   FileDigit,
+  Star,
   Save,
   Trash2,
   Eye,
@@ -24,6 +25,7 @@ import {
 import type { Project, TeamMember } from '@/types';
 import { mockDataService } from '@/lib/dataService';
 import { PROJECT_CATEGORIES, PROJECT_STATUSES, VISIBILITY_OPTIONS } from '@/types';
+import { deleteProjectMedia } from '@/lib/supabase';
 
 // Admin components
 import { SlugInput } from '@/features/admin/components/forms/SlugInput';
@@ -58,6 +60,7 @@ export function PortfolioForm() {
     category: 'vlsi',
     status: 'draft',
     visibility: 'public',
+    isFeatured: false,
     thumbnail: '',
     coverImage: '',
     images: [],
@@ -98,8 +101,9 @@ export function PortfolioForm() {
         if (isEdit && slug) {
           const project = await mockDataService.getProjectBySlug(slug);
           if (project) {
-            setFormData(project);
-            setOriginalData(JSON.stringify(project));
+            const normalizedProject = { ...project, isFeatured: project.isFeatured ?? false };
+            setFormData(normalizedProject);
+            setOriginalData(JSON.stringify(normalizedProject));
           } else {
             toast.error('Project not found');
             navigate('/admin/projects');
@@ -168,6 +172,7 @@ export function PortfolioForm() {
       const normalizedEndDate = formData.endDate?.trim() ? formData.endDate : undefined;
       const dataToSave = {
         ...formData,
+        isFeatured: formData.isFeatured ?? false,
         endDate: normalizedEndDate,
         status: asDraft ? 'draft' : formData.status === 'draft' ? 'ongoing' : formData.status,
         publishedAt: !asDraft && formData.status === 'draft' ? new Date().toISOString() : formData.publishedAt,
@@ -240,6 +245,7 @@ export function PortfolioForm() {
     if (!confirm('Are you sure you want to delete this project?')) return;
     
     try {
+      await deleteProjectMedia(formData as Project);
       await mockDataService.deleteProject(formData.id);
       toast.success('Project deleted successfully!');
       await logAdminAction({
@@ -412,7 +418,7 @@ export function PortfolioForm() {
               />
 
               {/* Category & Status */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-white/60 text-sm mb-1.5">Category</label>
                   <div className="relative">
@@ -475,6 +481,28 @@ export function PortfolioForm() {
                       ))}
                     </select>
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-white/60 text-sm mb-1.5">Featured</label>
+                  <button
+                    type="button"
+                    onClick={() => handleChange('isFeatured', !formData.isFeatured)}
+                    className={`w-full px-3 py-2 rounded-lg border text-sm flex items-center justify-between transition-all ${
+                      formData.isFeatured
+                        ? 'bg-amber-500/20 border-amber-500/40 text-amber-200'
+                        : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20'
+                    }`}
+                  >
+                    <span>{formData.isFeatured ? 'Started / Featured' : 'Mark as Started'}</span>
+                    <Star
+                      className="w-4 h-4"
+                      fill={formData.isFeatured ? 'currentColor' : 'none'}
+                    />
+                  </button>
+                  <p className="text-white/30 text-xs mt-1">
+                    Only started projects appear in the home page Featured section.
+                  </p>
                 </div>
               </div>
 

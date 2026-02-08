@@ -11,8 +11,9 @@ export function FeaturedProjects() {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const data = await mockDataService.getProjects();
-      setProjects(data.slice(0, 3));
+      const featured = await mockDataService.getProjects(undefined, { featuredOnly: true });
+      const source = featured.length > 0 ? featured : await mockDataService.getProjects();
+      setProjects(source.slice(0, 3));
       setLoading(false);
     };
     fetchProjects();

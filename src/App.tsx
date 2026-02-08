@@ -21,7 +21,8 @@ import {
   PortfolioForm, 
   TeamForm, 
   PortfolioEditLegacy, 
-  TeamEditLegacy 
+  TeamEditLegacy,
+  AboutAdminPage,
 } from '@/features/admin/pages';
 import { AdminGate } from '@/features/admin/components/AdminGate';
 
@@ -184,6 +185,7 @@ function App() {
           <Route path="/admin/team" element={<AdminRoute><TeamPage /></AdminRoute>} />
           <Route path="/admin/logs" element={<AdminRoute><LogsPage /></AdminRoute>} />
           <Route path="/admin/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />
+          <Route path="/admin/about" element={<AdminRoute><AboutAdminPage /></AdminRoute>} />
           
           {/* Portfolio Admin Forms with Sidebar */}
           <Route path="/admin/portfolio/new" element={<AdminRoute><PortfolioForm /></AdminRoute>} />

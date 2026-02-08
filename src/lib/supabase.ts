@@ -2,12 +2,6 @@ import { createClient } from '@supabase/supabase-js';
 import type { Project, TeamMember, AboutData, AdminUser, ActivityLog, SocialLink } from '@/types';
 import { normalizeExternalUrl, normalizeSocialUrl } from '@/lib/url';
 
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
-
-export const supabase = createClient<Database>(supabaseUrl, supabaseKey);
-
 // Database Types for TypeScript
 export type Database = {
   public: {
@@ -71,17 +65,35 @@ export type Database = {
         Update: Partial<ActivityLog>;
       };
     };
+    Views: {};
+    Functions: {};
+    Enums: {};
+    CompositeTypes: {};
   };
 };
+
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Helper functions for common operations
 
 // Projects
-export async function getProjects(category?: string): Promise<Project[]> {
+type ProjectFilterOptions = {
+  featuredOnly?: boolean;
+};
+
+export async function getProjects(category?: string, options?: ProjectFilterOptions): Promise<Project[]> {
   let query = supabase.from('projects').select('*').order('createdAt', { ascending: false });
   
   if (category) {
     query = query.eq('category', category);
+  }
+
+  if (options?.featuredOnly) {
+    query = query.eq('isFeatured', true);
   }
   
   const { data, error } = await query;
@@ -153,9 +165,14 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 }
 
 export async function createProject(project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project | null> {
+  const payload = {
+    ...project,
+    isFeatured: project.isFeatured ?? false,
+  };
+
   const { data, error } = await supabase
     .from('projects')
-    .insert(project)
+    .insert(payload)
     .select()
     .single();
   
@@ -229,11 +246,21 @@ function normalizeTeamMemberPayload<T extends Partial<TeamMember>>(member: T): T
   return normalized as T;
 }
 
-export async function getTeamMembers(): Promise<TeamMember[]> {
-  const { data, error } = await supabase
+type TeamMemberFilterOptions = {
+  featuredOnly?: boolean;
+};
+
+export async function getTeamMembers(options?: TeamMemberFilterOptions): Promise<TeamMember[]> {
+  let query = supabase
     .from('team_members')
     .select('*')
     .order('name', { ascending: true });
+
+  if (options?.featuredOnly) {
+    query = query.eq('isFeatured', true);
+  }
+  
+  const { data, error } = await query;
   
   if (error) {
     console.error('Error fetching team members:', error);
@@ -259,9 +286,14 @@ export async function getTeamMemberBySlug(slug: string): Promise<TeamMember | nu
 }
 
 export async function createTeamMember(member: Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>): Promise<TeamMember | null> {
+  const payload = {
+    ...normalizeTeamMemberPayload(member),
+    isFeatured: member.isFeatured ?? false,
+  };
+
   const { data, error } = await supabase
     .from('team_members')
-    .insert(normalizeTeamMemberPayload(member))
+    .insert(payload)
     .select()
     .single();
   
@@ -364,6 +396,34 @@ export async function getAboutData(): Promise<AboutData | null> {
   return data || null;
 }
 
+export async function saveAboutData(
+  payload: Omit<AboutData, 'id'> & { id?: string }
+): Promise<AboutData | null> {
+  const existing = await getAboutData();
+  const dataToSave = {
+    ...(existing?.id ? { id: existing.id } : {}),
+    ...payload,
+    gallery: payload.gallery || [],
+    stats: payload.stats || [],
+    history: payload.history || [],
+    facilities: payload.facilities || [],
+    partners: payload.partners || [],
+  };
+
+  const { data, error } = await supabase
+    .from('about_data')
+    .upsert(dataToSave, { onConflict: 'id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving about data:', error);
+    return null;
+  }
+
+  return data;
+}
+
 // File Upload
 export async function uploadFile(bucket: string, path: string, file: File): Promise<string | null> {
   const { data, error } = await supabase
@@ -385,6 +445,68 @@ export async function uploadFile(bucket: string, path: string, file: File): Prom
     .getPublicUrl(data.path);
   
   return publicUrl;
+}
+
+// Storage helpers
+export function getStoragePathFromUrl(url?: string | null): { bucket: string; path: string } | null {
+  const trimmed = (url || '').trim();
+  if (!trimmed) return null;
+
+  const normalizedSupabaseUrl = supabaseUrl.replace(/\/$/, '');
+  const publicPrefix = `${normalizedSupabaseUrl}/storage/v1/object/public/`;
+  if (!trimmed.startsWith(publicPrefix)) return null;
+
+  const withoutPrefix = trimmed.slice(publicPrefix.length);
+  const [bucket, ...rest] = withoutPrefix.split('/');
+  const path = rest.join('/');
+
+  if (!bucket || !path) return null;
+  return { bucket, path };
+}
+
+export async function deleteFileByUrl(url?: string | null): Promise<boolean> {
+  const info = getStoragePathFromUrl(url);
+  if (!info) return false;
+
+  const { error } = await supabase.storage.from(info.bucket).remove([info.path]);
+  if (error) {
+    console.error('Error deleting file from storage:', error);
+    return false;
+  }
+  return true;
+}
+
+export async function deleteFilesByUrl(urls: (string | null | undefined)[]): Promise<void> {
+  const bucketMap = new Map<string, string[]>();
+
+  urls.forEach((url) => {
+    const info = getStoragePathFromUrl(url);
+    if (info) {
+      const list = bucketMap.get(info.bucket) || [];
+      list.push(info.path);
+      bucketMap.set(info.bucket, list);
+    }
+  });
+
+  await Promise.all(
+    Array.from(bucketMap.entries()).map(async ([bucket, paths]) => {
+      const { error } = await supabase.storage.from(bucket).remove(paths);
+      if (error) {
+        console.error(`Error deleting files from bucket ${bucket}:`, error);
+      }
+    })
+  );
+}
+
+export async function deleteProjectMedia(project?: Project | null) {
+  if (!project) return;
+  const videoThumbs = (project.videos || []).map((video) => video.thumbnailUrl).filter(Boolean);
+  await deleteFilesByUrl([project.thumbnail, project.coverImage, ...(project.images || []), ...videoThumbs]);
+}
+
+export async function deleteTeamMemberMedia(member?: TeamMember | null) {
+  if (!member) return;
+  await deleteFilesByUrl([member.avatar, member.coverImage, member.bannerImage, member.resume?.url]);
 }
 
 // Auth

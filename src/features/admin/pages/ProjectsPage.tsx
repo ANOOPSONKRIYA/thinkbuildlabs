@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Project } from '@/types';
 import { mockDataService } from '@/lib/dataService';
+import { deleteProjectMedia } from '@/lib/supabase';
 import { logAdminAction } from '@/lib/activityLogs';
 import { AdminLayout } from '@/features/admin/components/AdminLayout';
 
@@ -30,6 +31,9 @@ export function ProjectsPage() {
 
     try {
       const project = projects.find((p) => p.id === id);
+      if (project) {
+        await deleteProjectMedia(project);
+      }
       await mockDataService.deleteProject(id);
       toast.success('Project deleted successfully');
       await logAdminAction({
@@ -43,6 +47,26 @@ export function ProjectsPage() {
       fetchProjects();
     } catch (error) {
       toast.error('Failed to delete project');
+    }
+  };
+
+  const handleToggleFeatured = async (project: Project) => {
+    try {
+      const next = !project.isFeatured;
+      await mockDataService.updateProject(project.id, { isFeatured: next });
+      toast.success(next ? 'Project started and featured' : 'Removed from featured');
+      await logAdminAction({
+        action: next ? 'feature' : 'unfeature',
+        entityType: 'project',
+        entityId: project.id,
+        entitySlug: project.slug,
+        entityName: project.title,
+        message: `${next ? 'Started' : 'Unstarted'} project "${project.title}"`,
+        details: { isFeatured: next },
+      });
+      fetchProjects();
+    } catch (error) {
+      toast.error('Failed to update featured status');
     }
   };
 
@@ -104,7 +128,12 @@ export function ProjectsPage() {
                           className="w-8 sm:w-10 h-8 sm:h-10 rounded-lg object-cover"
                         />
                         <div>
-                          <p className="text-white text-xs sm:text-sm font-medium truncate max-w-[120px] sm:max-w-none">{project.title}</p>
+                          <div className="flex items-center gap-1">
+                            <p className="text-white text-xs sm:text-sm font-medium truncate max-w-[120px] sm:max-w-none">{project.title}</p>
+                            {project.isFeatured && (
+                              <Star className="w-3.5 h-3.5 text-amber-300" fill="currentColor" />
+                            )}
+                          </div>
                           <p className="text-white/30 text-[10px] sm:text-xs">/{project.slug}</p>
                         </div>
                       </div>
@@ -136,6 +165,18 @@ export function ProjectsPage() {
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center justify-end gap-1 sm:gap-2">
+                        <button
+                          onClick={() => handleToggleFeatured(project)}
+                          className={`p-1.5 sm:p-2 rounded-lg hover:bg-white/10 transition-colors ${
+                            project.isFeatured ? 'text-amber-300' : 'text-white/40 hover:text-white'
+                          }`}
+                          title={project.isFeatured ? 'Unstart project' : 'Start / feature project'}
+                        >
+                          <Star
+                            className="w-3.5 sm:w-4 h-3.5 sm:h-4"
+                            fill={project.isFeatured ? 'currentColor' : 'none'}
+                          />
+                        </button>
                         <button
                           onClick={() => window.open(`/portfolio/${project.slug}`, '_blank')}
                           className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"

@@ -21,6 +21,7 @@ import {
   Calendar,
   Activity,
   Search,
+  Star,
   Save,
   Trash2,
   Eye,
@@ -29,6 +30,7 @@ import {
 
 import type { TeamMember, Education, Experience, Achievement, SocialLink, Project, Resume } from '@/types';
 import { mockDataService } from '@/lib/dataService';
+import { deleteTeamMemberMedia } from '@/lib/supabase';
 
 // Admin components
 import { SlugInput } from '@/features/admin/components/forms/SlugInput';
@@ -88,6 +90,7 @@ export function TeamForm() {
     achievements: [],
     isActive: true,
     status: 'active',
+    isFeatured: false,
     joinedAt: new Date().toISOString().split('T')[0],
     memberSince: new Date().toISOString().split('T')[0],
     metaTitle: '',
@@ -113,8 +116,9 @@ export function TeamForm() {
         if (isEdit && slug) {
           const member = await mockDataService.getTeamMemberBySlug(slug);
           if (member) {
-            setFormData(member);
-            setOriginalData(JSON.stringify(member));
+            const normalizedMember = { ...member, isFeatured: member.isFeatured ?? false };
+            setFormData(normalizedMember);
+            setOriginalData(JSON.stringify(normalizedMember));
           } else {
             toast.error('Team member not found');
             navigate('/admin/team');
@@ -211,6 +215,7 @@ export function TeamForm() {
           : undefined;
       const dataToSave = {
         ...formData,
+        isFeatured: formData.isFeatured ?? false,
         socialLinks: normalizedSocialLinks,
         achievements: normalizedAchievements,
         resume: normalizedResume,
@@ -276,6 +281,7 @@ export function TeamForm() {
     if (!confirm('Are you sure you want to delete this team member?')) return;
     
     try {
+      await deleteTeamMemberMedia(formData as TeamMember);
       await mockDataService.deleteTeamMember(formData.id);
       toast.success('Team member deleted successfully!');
       await logAdminAction({
@@ -1066,7 +1072,7 @@ export function TeamForm() {
             icon={<Calendar className="w-5 h-5 text-pink-400" />}
           >
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-white/60 text-sm mb-1.5">Status</label>
                   <div className="relative">
@@ -1096,6 +1102,27 @@ export function TeamForm() {
                     onChange={(e) => handleChange('joinedAt', e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-white/20"
                   />
+                </div>
+                <div>
+                  <label className="block text-white/60 text-sm mb-1.5">Featured</label>
+                  <button
+                    type="button"
+                    onClick={() => handleChange('isFeatured', !formData.isFeatured)}
+                    className={`w-full px-3 py-2 rounded-lg border text-sm flex items-center justify-between transition-all ${
+                      formData.isFeatured
+                        ? 'bg-amber-500/20 border-amber-500/40 text-amber-200'
+                        : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20'
+                    }`}
+                  >
+                    <span>{formData.isFeatured ? 'Started / Featured' : 'Mark as Started'}</span>
+                    <Star
+                      className="w-4 h-4"
+                      fill={formData.isFeatured ? 'currentColor' : 'none'}
+                    />
+                  </button>
+                  <p className="text-white/30 text-xs mt-1">
+                    Started members appear in the home page team section.
+                  </p>
                 </div>
               </div>
 

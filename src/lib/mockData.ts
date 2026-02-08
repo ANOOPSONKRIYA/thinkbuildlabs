@@ -28,6 +28,7 @@ export const mockProjects: Project[] = [
     category: 'vlsi',
     status: 'completed',
     visibility: 'public',
+    isFeatured: true,
     thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
     coverImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
     images: [
@@ -98,6 +99,7 @@ export const mockProjects: Project[] = [
     category: 'ai-robotics',
     status: 'ongoing',
     visibility: 'public',
+    isFeatured: true,
     thumbnail: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80',
     coverImage: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80',
     images: [
@@ -154,6 +156,7 @@ export const mockProjects: Project[] = [
     category: 'quantum',
     status: 'ongoing',
     visibility: 'public',
+    isFeatured: true,
     thumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80',
     coverImage: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=1200&q=80',
     images: [
@@ -199,6 +202,7 @@ export const mockProjects: Project[] = [
     category: 'ai-robotics',
     status: 'ongoing',
     visibility: 'public',
+    isFeatured: false,
     thumbnail: 'https://images.unsplash.com/photo-1589254065878-42c9da997008?w=800&q=80',
     coverImage: 'https://images.unsplash.com/photo-1589254065878-42c9da997008?w=1200&q=80',
     images: [
@@ -246,6 +250,7 @@ export const mockProjects: Project[] = [
     category: 'vlsi',
     status: 'completed',
     visibility: 'public',
+    isFeatured: false,
     thumbnail: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
     coverImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
     images: [
@@ -292,6 +297,7 @@ export const mockProjects: Project[] = [
     category: 'ai-robotics',
     status: 'ongoing',
     visibility: 'public',
+    isFeatured: false,
     thumbnail: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=800&q=80',
     coverImage: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=1200&q=80',
     images: [
@@ -408,6 +414,7 @@ export const mockTeamMembers: TeamMember[] = [
     ],
     isActive: true,
     status: 'active',
+    isFeatured: true,
     joinedAt: '2020-01-15',
     memberSince: '2020-01-15',
     metaTitle: 'Alex Chen | VLSI Design Lead',
@@ -465,6 +472,7 @@ export const mockTeamMembers: TeamMember[] = [
     ],
     isActive: true,
     status: 'active',
+    isFeatured: true,
     joinedAt: '2019-09-01',
     memberSince: '2019-09-01',
     createdAt: '2019-09-01T00:00:00Z',
@@ -518,6 +526,7 @@ export const mockTeamMembers: TeamMember[] = [
     ],
     isActive: true,
     status: 'active',
+    isFeatured: true,
     joinedAt: '2022-09-01',
     memberSince: '2022-09-01',
     createdAt: '2022-09-01T00:00:00Z',
@@ -571,6 +580,7 @@ export const mockTeamMembers: TeamMember[] = [
     ],
     isActive: true,
     status: 'active',
+    isFeatured: true,
     joinedAt: '2022-06-01',
     memberSince: '2022-06-01',
     createdAt: '2022-06-01T00:00:00Z',
@@ -624,6 +634,7 @@ export const mockTeamMembers: TeamMember[] = [
     ],
     isActive: true,
     status: 'active',
+    isFeatured: false,
     joinedAt: '2021-07-01',
     memberSince: '2021-07-01',
     createdAt: '2021-07-01T00:00:00Z',
@@ -707,6 +718,12 @@ export const mockAboutData: AboutData = {
       image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80'
     }
   ],
+  gallery: [
+    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&q=80',
+    'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=1200&q=80',
+    'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80',
+    'https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?w=1200&q=80',
+  ],
   partners: [
     { id: 'p1', name: 'NVIDIA', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg', website: 'https://nvidia.com' },
     { id: 'p2', name: 'Intel', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/Intel_logo_%282006-2020%29.svg', website: 'https://intel.com' },
@@ -718,12 +735,16 @@ export const mockAboutData: AboutData = {
 // Mock data service functions
 export const mockDataService = {
   // Projects
-  getProjects: async (category?: string): Promise<Project[]> => {
+  getProjects: async (category?: string, options?: { featuredOnly?: boolean }): Promise<Project[]> => {
     await new Promise(resolve => setTimeout(resolve, 500));
+    let results = mockProjects;
     if (category) {
-      return mockProjects.filter(p => p.category === category);
+      results = results.filter(p => p.category === category);
     }
-    return mockProjects;
+    if (options?.featuredOnly) {
+      results = results.filter((p) => p.isFeatured);
+    }
+    return results;
   },
   
   getProjectBySlug: async (slug: string): Promise<Project | null> => {
@@ -735,6 +756,7 @@ export const mockDataService = {
     await new Promise(resolve => setTimeout(resolve, 500));
     const newProject: Project = {
       ...project,
+      isFeatured: project.isFeatured ?? false,
       id: Math.random().toString(36).substr(2, 9),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -760,8 +782,11 @@ export const mockDataService = {
   },
   
   // Team Members
-  getTeamMembers: async (): Promise<TeamMember[]> => {
+  getTeamMembers: async (options?: { featuredOnly?: boolean }): Promise<TeamMember[]> => {
     await new Promise(resolve => setTimeout(resolve, 500));
+    if (options?.featuredOnly) {
+      return mockTeamMembers.filter((m) => m.isFeatured);
+    }
     return mockTeamMembers;
   },
   
@@ -774,6 +799,7 @@ export const mockDataService = {
     await new Promise(resolve => setTimeout(resolve, 500));
     const newMember: TeamMember = {
       ...member,
+      isFeatured: member.isFeatured ?? false,
       id: Math.random().toString(36).substr(2, 9),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -801,6 +827,17 @@ export const mockDataService = {
   // About
   getAboutData: async (): Promise<AboutData> => {
     await new Promise(resolve => setTimeout(resolve, 300));
+    return mockAboutData;
+  },
+
+  saveAboutData: async (data: Omit<AboutData, 'id'> & { id?: string }): Promise<AboutData> => {
+    const generatedId =
+      (typeof crypto !== 'undefined' && 'randomUUID' in crypto && crypto.randomUUID()) ||
+      data.id ||
+      mockAboutData.id ||
+      Math.random().toString(36).slice(2);
+
+    Object.assign(mockAboutData, data, { id: generatedId });
     return mockAboutData;
   }
 };

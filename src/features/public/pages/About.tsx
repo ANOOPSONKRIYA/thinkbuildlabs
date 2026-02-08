@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import type { ElementType } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Target, 
   Eye, 
   Lightbulb, 
   CheckCircle2,
+  Star,
   Users,
   BookOpen,
   Hexagon,
@@ -16,7 +18,7 @@ import {
   Zap,
   Layers
 } from 'lucide-react';
-import type { AboutData } from '@/types';
+import type { AboutData, Partner } from '@/types';
 import { mockDataService } from '@/lib/dataService';
 
 // Partner logos using Lucide icons
@@ -30,6 +32,14 @@ const PARTNER_ICONS = [
   { name: "Google", icon: Zap },
   { name: "Microsoft", icon: Layers },
 ];
+
+const PARTNER_FALLBACK = PARTNER_ICONS.map((partner) => ({
+  id: partner.name,
+  name: partner.name,
+  logo: '',
+  website: undefined,
+  icon: partner.icon,
+}));
 
 export function About() {
   const [aboutData, setAboutData] = useState<AboutData | null>(null);
@@ -56,18 +66,12 @@ export function About() {
 
   if (!aboutData) return null;
 
+  const partners = (aboutData.partners?.length ? aboutData.partners : PARTNER_FALLBACK) as Array<
+    Partner & { icon?: ElementType }
+  >;
+
   return (
     <main className="relative min-h-screen pt-20 sm:pt-24 pb-16 sm:pb-20">
-      <style>{`
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-        }
-      `}</style>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -119,7 +123,7 @@ export function About() {
         >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {aboutData.stats.map((stat, index) => {
-              const icons: Record<string, React.ElementType> = {
+              const icons: Record<string, ElementType> = {
                 CheckCircle: CheckCircle2,
                 FileText: BookOpen,
                 Users: Users,
@@ -167,7 +171,15 @@ export function About() {
                 >
                   <div className="w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-white flex-shrink-0 mt-1.5 sm:mt-2 hidden sm:block" />
                   <div className="glass rounded-lg sm:rounded-xl p-4 sm:p-6 flex-1">
-                    <span className="text-white/40 text-xs sm:text-sm font-medium">{event.year}</span>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white/40 text-xs sm:text-sm font-medium">{event.year}</span>
+                      {event.milestone && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-200 text-[10px] sm:text-xs flex items-center gap-1">
+                          <Star className="w-3 h-3" />
+                          Milestone
+                        </span>
+                      )}
+                    </div>
                     <h3 className="text-white text-sm sm:text-base font-semibold mt-0.5 sm:mt-1">{event.title}</h3>
                     <p className="text-white/40 text-xs sm:text-sm mt-1 sm:mt-2">{event.description}</p>
                   </div>
@@ -211,35 +223,73 @@ export function About() {
           </div>
         </motion.section>
 
-        {/* Partners - Horizontal Marquee */}
+        {/* Gallery */}
+        {aboutData.gallery?.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mb-10 sm:mb-16"
+          >
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 sm:mb-8 text-center">Lab Gallery</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {aboutData.gallery.map((image, index) => (
+                <motion.div
+                  key={`${image}-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  className="relative group rounded-2xl overflow-hidden glass card-hover"
+                >
+                  <img
+                    src={image}
+                    alt={`Gallery ${index + 1}`}
+                    className="w-full h-56 sm:h-64 object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity" />
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* Partners */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
         >
           <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 sm:mb-8 text-center">Our Partners</h2>
-          <div className="glass rounded-xl sm:rounded-2xl py-6 sm:py-8 overflow-hidden">
-            <div 
-              className="relative flex overflow-hidden"
-              style={{
-                maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
-                WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)"
-              }}
-            >
-              <div className="animate-marquee flex gap-8 sm:gap-12 whitespace-nowrap px-4">
-                {[...PARTNER_ICONS, ...PARTNER_ICONS, ...PARTNER_ICONS].map((partner, i) => (
-                  <div 
-                    key={i}
-                    className="flex items-center gap-2 sm:gap-3 opacity-40 hover:opacity-100 transition-all hover:scale-105 cursor-default"
-                  >
-                    <partner.icon className="h-5 sm:h-8 w-5 sm:w-8 text-white" />
-                    <span className="text-base sm:text-xl font-bold text-white tracking-tight">
-                      {partner.name}
-                    </span>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+            {partners.map((partner, index) => {
+              const Icon = (partner as any).icon as ElementType | undefined;
+              return (
+                <a
+                  key={partner.id || partner.name || index}
+                  href={partner.website || '#'}
+                  target={partner.website ? '_blank' : undefined}
+                  rel="noopener noreferrer"
+                  className="glass rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center gap-2 text-center hover:border-white/20 transition-colors"
+                >
+                  <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-white/5 flex items-center justify-center overflow-hidden">
+                    {partner.logo ? (
+                      <img src={partner.logo} alt={partner.name} className="w-full h-full object-contain" />
+                    ) : Icon ? (
+                      <Icon className="h-6 sm:h-7 w-6 sm:w-7 text-white/70" />
+                    ) : (
+                      <Users className="h-6 sm:h-7 w-6 sm:w-7 text-white/50" />
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
+                  <span className="text-white font-semibold text-sm sm:text-base">{partner.name}</span>
+                  {partner.website && (
+                    <span className="text-white/40 text-xs sm:text-sm truncate max-w-[160px]">
+                      {partner.website.replace(/^https?:\/\//, '')}
+                    </span>
+                  )}
+                </a>
+              );
+            })}
           </div>
         </motion.section>
       </div>

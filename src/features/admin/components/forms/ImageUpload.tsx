@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, X, ImageIcon, Loader2, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
-import { uploadFile } from '@/lib/supabase';
+import { uploadFile, deleteFileByUrl } from '@/lib/supabase';
 
 interface ImageUploadProps {
   value: string;
@@ -41,6 +41,7 @@ export function ImageUpload({
 
   const processFile = async (file: File) => {
     setIsLoading(true);
+    const previousUrl = value;
 
     try {
       const ext = file.name.split('.').pop()?.toLowerCase() || 'png';
@@ -56,6 +57,10 @@ export function ImageUpload({
       }
 
       onChange(url);
+
+      if (previousUrl && previousUrl !== url) {
+        await deleteFileByUrl(previousUrl);
+      }
     } catch (error) {
       toast.error('Failed to upload image');
     } finally {
@@ -82,10 +87,14 @@ export function ImageUpload({
     setIsDragging(false);
   };
 
-  const clearImage = () => {
+  const clearImage = async () => {
+    const previousUrl = value;
     onChange('');
     if (inputRef.current) {
       inputRef.current.value = '';
+    }
+    if (previousUrl) {
+      await deleteFileByUrl(previousUrl);
     }
   };
 
@@ -198,8 +207,12 @@ export function GalleryImages({ images, onChange, label = 'Gallery Images' }: Ga
     setDraggedIndex(null);
   };
 
-  const removeImage = (index: number) => {
+  const removeImage = async (index: number) => {
+    const target = images[index];
     onChange(images.filter((_, i) => i !== index));
+    if (target) {
+      await deleteFileByUrl(target);
+    }
   };
 
   const addImageUrl = () => {

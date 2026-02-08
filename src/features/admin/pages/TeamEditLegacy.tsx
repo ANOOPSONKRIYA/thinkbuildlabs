@@ -47,6 +47,7 @@ export function TeamEditLegacy() {
     experience: [],
     achievements: [],
     isActive: true,
+    isFeatured: false,
     projects: [],
   });
 
@@ -58,7 +59,7 @@ export function TeamEditLegacy() {
       const fetchMember = async () => {
         const member = await mockDataService.getTeamMemberBySlug(slug);
         if (member) {
-          setFormData(member);
+          setFormData({ ...member, isFeatured: member.isFeatured ?? false });
         }
         setLoading(false);
       };
@@ -71,6 +72,7 @@ export function TeamEditLegacy() {
     
     const dataToSave = {
       ...formData,
+      isFeatured: formData.isFeatured ?? false,
       slug: formData.slug || formData.name?.toLowerCase().replace(/\s+/g, '-'),
       joinedAt: formData.joinedAt || new Date().toISOString().split('T')[0],
     } as Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>;

@@ -7,3 +7,4 @@ export { PortfolioForm } from './PortfolioForm';
 export { TeamForm } from './TeamForm';
 export { PortfolioEditLegacy } from './PortfolioEditLegacy';
 export { TeamEditLegacy } from './TeamEditLegacy';
+export { AboutAdminPage } from './AboutAdminPage';
